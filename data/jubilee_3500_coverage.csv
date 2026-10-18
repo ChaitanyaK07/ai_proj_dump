@@ -1,0 +1,24 @@
+item,count,% of edges,% of length
+nodes,13246,,
+directed edges,34708,,
+"network length (km, both directions)",2075.4,,
+tag: highway,34708,100.0,100.0
+tag: name,6656,19.2,25.2
+tag: surface,2300,6.6,10.1
+tag: lit,654,1.9,3.2
+tag: sidewalk,116,0.3,0.5
+tag: foot,824,2.4,4.2
+tag: incline,0,0.0,0.0
+tag: maxspeed,3100,8.9,13.4
+tag: lanes,1680,4.8,8.1
+highway=steps,60,0.2,0.1
+"canopy > 0 (WorldCover tree cover, 15 m)",9166,26.4,39.7
+canopy >= 0.25 (WorldCover tree cover),2686,7.7,12.8
+mean canopy (length-weighted),0.088,,
+has elevation grade,34708,100.0,100.0
+vegetation objects: natural=tree,277,,
+vegetation objects: natural=tree_row,21,,
+vegetation objects: natural=wood,10,,
+vegetation objects: leisure=park,220,,
+vegetation objects: leisure=garden,0,,
+vegetation objects: landuse=forest,1,,

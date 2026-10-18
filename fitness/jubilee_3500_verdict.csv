@@ -1,0 +1,12 @@
+criterion,value,target,verdict
+connectivity (SCC share),1.0,>= 0.95,PASS
+terrain relief (m),120.9,>= 30.0,PASS
+slider 'traffic' (w=0.8): overlap / gain% / detour%,0.36 / 29.0 / 12.0,<= 0.8 / >= 10.0 / <= 20.0,PASS
+slider 'canopy' (w=0.8): overlap / gain% / detour%,0.65 / 143.4 / 2.6,<= 0.8 / >= 10.0 / <= 20.0,PASS
+slider 'climb' (w=0.8): overlap / gain% / detour%,0.55 / 25.8 / 3.0,<= 0.8 / >= 10.0 / <= 20.0,PASS
+slider 'turn' (w=0.8): overlap / gain% / detour%,0.45 / 56.5 / 5.1,<= 0.8 / >= 10.0 / <= 20.0,PASS
+user-study profiles with enough candidate pairs,4/4,>= 3 profiles with >= 4 pairs,PASS
+"problem exists: rise in A*(h_adm)/Dijkstra, lambda 0 -> 0.9",0.477,>= 0.15,PASS
+headroom: A*(h*)/A*(h_adm) expansions at lambda 0.9,0.015,<= 0.5,PASS
+search correctness (cost mismatches),0,0,PASS
+"label sweep, single core (h)",0.51,<= 6.0,PASS

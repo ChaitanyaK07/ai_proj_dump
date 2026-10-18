@@ -1,0 +1,174 @@
+# Routes That Fit You
+
+**A Personalised Multi-Objective Route Planner with Learned Search Heuristics**
+
+CS F407 Artificial Intelligence course project · Team **Wayfinder**
+
+**Track:** Application · **Topic areas:** Search & Problem Solving + Applications of Deep Learning
+
+---
+
+## Overview
+
+A walking route planner for the Jubilee Hills / Banjara Hills area of Hyderabad in which the user, rather than the system, decides what matters. Five sliders set weights over **walking time, junction load, traffic exposure, canopy and climb**, and the engine returns the lowest-cost route under those weights.
+
+Ordinary A* slows down once cost is no longer plain distance, because the only safe heuristic becomes a weak guide. We train a small neural network, conditioned on the slider weights, to guide the search, and use **Focal Search** so every route is provably within a stated factor of optimal. The system is evaluated on 200 frozen benchmark queries against exact ground truth, and in a small user study.
+
+## Team
+
+| # | Member |
+|---|--------|
+| 1 | Vinny Polamarasetty |
+| 2 | Soujanya Lakshmi Tayyala |
+| 3 | Chandana N |
+| 4 | Chaitanya Srikar Kastury |
+| 5 | Anisha Potdar |
+| 6 | Ananya Avunooru |
+| 7 | Anushka Sahoo |
+| 8 | Srujana N S |
+
+## Problem and Motivation
+
+Mainstream route planners answer one question: what is the fastest way there? Many trips are not about that. A student with a heavy bag will accept three extra minutes to avoid a staircase; someone recovering from a knee injury routes around gradients; in a Hyderabad summer, walking under tree cover is worth a detour. No widely available tool lets a person state these preferences.
+
+**Why this is technically hard.** A* beats Dijkstra by using a heuristic (an estimate of remaining cost). For plain travel time, straight-line distance never overestimates (admissibility), which is what makes A* optimal. Once cost mixes walking time with junction penalties, traffic exposure, canopy and climb, a distance-based estimate stays admissible but becomes a very weak guide, and A* degenerates toward Dijkstra. The stronger the user's non-distance preferences, the worse it gets, exactly when personalisation matters most.
+
+> **The problem as a measurement.** Node expansions climb as the non-distance slider weights increase. That curve, plotted against weight strength, is our problem statement, and producing it is the first experimental result of the project.
+
+## Approach
+
+### Preference-conditioned learned heuristic
+
+A small neural network estimates remaining cost from the current node, the destination and the user's weight vector. Because the weight vector is an *input*, one trained model serves every slider setting with no per-objective precomputation.
+
+Training labels are exact: one backward Dijkstra run from a destination gives the true optimal cost-to-go from every node under a given weight vector, so the heuristic is learned by ordinary supervised regression.
+
+```
+rho(e, w) = 0.1 + sum_k w_k * f_k(e)            # k = time, traffic, canopy, climb
+c(e_in, e_out, w) = length(e_out) * rho(e_out, w) + w_turn * 30 m * turn_penalty(e_in, e_out)
+h_adm(v, t, w)   = rho_min(w) * haversine(v, t)  # rho_min: cheapest cost per metre
+h_learn(v, t, w) = r_hat * h_adm(v, t, w),  r_hat = 1 + softplus(MLP(x)) >= 1
+```
+
+- Every feature `f_k` is a per-metre score in [0, 1]; the base term 0.1 keeps `rho_min` above zero for every weight vector.
+- Search states are `(node, incoming edge)` pairs so turns can be priced.
+- `h_adm` is admissible and consistent: every metre costs at least `rho_min`, and turn penalties only add.
+- The network takes node2vec embeddings of the node and target, the weight vector and the straight-line offset, and predicts a ratio `r_hat >= 1` on top of `h_adm`, so it is never less informed than the classical baseline.
+- Labels: 40 training weight vectors × 200 target nodes = 8,000 backward runs (~30 min on one core). 10 further weight vectors are held out; the train/test split is by target node.
+
+### Focal Search for a provable bound
+
+A learned heuristic will sometimes overestimate, which voids A*'s optimality guarantee, and weighted A* does not rescue this (its bound holds only for admissible heuristics). Focal Search separates the two roles:
+
+- **OPEN** is ordered by `f = g + h_adm`, which is provably safe.
+- **FOCAL** contains every node in OPEN whose `f` is within `W ×` the current minimum.
+- The **learned heuristic** (free to be inadmissible) decides which node in FOCAL to expand.
+
+The bound (route cost ≤ `W ×` optimal) comes from the safe estimate; the guidance comes from the learned one. Since backward Dijkstra gives exact optimal costs, we verify the bound empirically for `W` from 1.0 to 2.0 and plot guaranteed factor against achieved suboptimality.
+
+## Data and Study Area
+
+All data is open: OpenStreetMap (ODbL), ESA WorldCover 2021 (CC BY 4.0) and Copernicus GLO-30 DEM. No purchased data, API keys or scraping. Everything runs on a laptop CPU plus an occasional free-tier GPU.
+
+Attributes are labelled *measured*, *derived* or *proxy* consistently rather than presented as uniformly reliable.
+
+| Feature | Source | Status | Derivation |
+|---|---|---|---|
+| Walking time | OSM highway class, segment length | Measured | Assumed speed per class, from 1.3 m/s on footways to 0.5 m/s on steps |
+| Junction load | Node degree, way geometry | Derived, exact | Turn angle from bearings; no tagging dependency |
+| Traffic exposure | Ranking over OSM highway class | Proxy | OSM has no traffic-volume tag; this is an ordinal proxy |
+| Canopy proximity | ESA WorldCover 2021 (10 m) | Proxy | Tree-cover share within a 15 m buffer around the edge |
+| Climb | Copernicus GLO-30 DEM; `highway=steps` | Derived, reliable | Uphill grade `max(0, rise) / length`, clipped at 15%, plus a fixed stairway penalty |
+
+**Why "canopy proximity", not "shade".** Genuine shade modelling needs building heights and solar position, and building-height tagging in Hyderabad OSM is too sparse. Tree-cover proximity is what can be defensibly computed; it correlates with shade without measuring it.
+
+**Study area and coverage audit.** Three candidate areas were audited before writing the cost model:
+
+- **Around the BITS campus:** OSM mapping too sparse (no street names or stairways).
+- **Miyapur:** OSM vegetation covered only 6.8% of edges; canopy preference changed routes negligibly (92% overlap with the fastest route); terrain relief was 51 m.
+- **Jubilee Hills:** working signal on every feature. At preference weight 0.8, traffic exposure fell 29%, climb 26% and turns 57%, and canopy along the route more than doubled, each at a mean detour of 12% or less.
+
+The final 7 × 7 km graph, centred at 17.4220° N, 78.4200° E, has **13,246 nodes** and **34,708 directed edges** and is fully strongly connected (~7,200 Dijkstra expansions per query, large enough for efficiency gains to matter).
+
+## Evaluation Plan
+
+### Algorithmic
+
+A benchmark of **200 queries** is frozen in Week 3 with fixed seeds and never regenerated. Learned conditions run with three training seeds and are reported as median with IQR.
+
+| Metric | What it establishes |
+|---|---|
+| Nodes expanded and generated | Search efficiency (primary claim) |
+| Query latency (ms) | Interactive usability |
+| Suboptimality ratio | Route quality vs. the exact optimum |
+| Admissibility / consistency violations, informedness (h / h*) | How often the learned heuristic overestimates and how much true cost it recovers |
+| Guaranteed vs. achieved suboptimality | Whether Focal Search's bound holds in practice (headline figure) |
+| Held-out weight vectors | Whether the heuristic generalises or memorises |
+
+### Human
+
+Backward Dijkstra proves a route is optimal for the cost function we wrote; it does not show that the cost function reflects what people would choose. For 12 real origin-destination pairs within Jubilee Hills / Banjara Hills, we generate the fastest route and the route under one of three stated preference profiles. About 25 participants see both on a map, unlabelled and in random order, with a short scenario, and pick the one they would take. We report agreement rate per profile with participant count and make no claim of statistical significance at this sample size. Remaining weight combinations are algorithmically correct but behaviourally untested.
+
+## Work Division
+
+Eight members work in four pairs so work is reviewed before it lands, each member can answer viva questions on two components, and no single absence stalls a workstream. Report writing, AI-usage disclosure and viva prep are shared.
+
+| Pair | Build phase (Weeks 1–4) | Second phase (Weeks 5–7) | Members |
+|---|---|---|---|
+| **Graph** | OSM extraction, coverage audit, UTM projection, turn-aware graph, five feature extractors, cost model | Routing service (FastAPI) and web interface with sliders | Anisha / Ananya |
+| **Search** | Dijkstra, A*, weighted A*, admissible heuristic, turn-aware expansion, node accounting, batched inference | Focal Search, W sweep, empirical bound verification | Srujana / Anushka |
+| **Data** | Backward Dijkstra at scale, weight-vector sampling, label pipeline, dataset publication, node2vec embeddings | Evaluation harness, heuristic-quality analysis, all plots | Soujanya / Chandana |
+| **Model** | Architecture, ratio parameterisation, training loop, hyperparameter pass, checkpointing | Generalisation on held-out weights, user study | Vinny / Chaitanya |
+
+## Timeline
+
+Week 2 is deliberately light (mid-semester exam). Week 7 is buffer and viva preparation.
+
+| Week | Focus | Gate |
+|---|---|---|
+| 1 | Interfaces frozen; fixture graph; OSM extraction and coverage audit; Dijkstra and A* | A route computes on real data; coverage table exists |
+| 2 | Mid-sem exam. Projection, geometry, weighted A* | A* matches Dijkstra's path with fewer expansions |
+| 3 | Turn-aware states; all five features; backward Dijkstra; frozen benchmark | Moving a slider visibly changes the route |
+| 4 | Full graph; label sweep; embeddings; first trained model; batched inference | **Go / no-go:** learned heuristic beats classical baseline |
+| 5 | Focal Search and W sweep; routing service; heuristic-quality analysis; generalisation runs | Bound holds empirically across the sweep |
+| 6 | Web interface; latency profiling; user study; results locked | Every claim traces to a result file |
+| 7 | Buffer. Clean-clone reproducibility test, report, demo video, mock viva | Every member passes the mock viva |
+
+**Week 4 go / no-go.** If the learned heuristic is not expanding fewer nodes than the classical baseline on the frozen query set, we stop tuning and fall back to Focal Search guided by a tuned classical heuristic, plus a measurement study of why the learned version failed. The search algorithms, bound study, heuristic-quality analysis and user evaluation survive intact; only the headline changes.
+
+## Risks and Mitigation
+
+| Risk | Mitigation |
+|---|---|
+| Sparse environmental data | Initial coverage audit |
+| Limited gains from the learned heuristic | Week 4 go / no-go fallback |
+| Network inference overhead | Batched inference with cached embeddings |
+| Incorrect Focal Search implementation | Regression testing against exact optimal routes |
+
+## Scope
+
+**In scope:** personalised walking routes within the Jubilee Hills / Banjara Hills study area using static OSM, ESA WorldCover and Copernicus DEM data.
+
+**Out of scope:** live traffic, public transport, turn-by-turn navigation, full-city routing, night-time lighting, ALT landmark baselines, and frontend polish beyond a functional map with sliders.
+
+## Process
+
+- `main` is protected; pull requests are reviewed across pairs.
+- Each member commits weekly.
+- An AI-usage log, weekly progress log and automatically generated result files are maintained throughout.
+- The project makes **no novelty claim**; its contribution is the ground-truth-verified evaluation of preference-conditioned learned heuristics and Focal Search.
+
+## Data Licences
+
+- OpenStreetMap: ODbL
+- ESA WorldCover 2021: CC BY 4.0
+- Copernicus GLO-30 DEM
+
+## References
+
+1. Hart, P. E., Nilsson, N. J., Raphael, B. (1968). A Formal Basis for the Heuristic Determination of Minimum Cost Paths. *IEEE Transactions on Systems Science and Cybernetics*, 4(2), 100–107.
+2. Pearl, J., Kim, J. H. (1982). Studies in Semi-Admissible Heuristics. *IEEE TPAMI*, 4(4), 392–399. (Focal Search and bounded suboptimality)
+3. Goldberg, A. V., Harrelson, C. (2005). Computing the Shortest Path: A* Search Meets Graph Theory. *SODA 2005*. (ALT landmarks)
+4. Boeing, G. (2017). OSMnx: New Methods for Acquiring, Constructing, Analyzing, and Visualizing Complex Street Networks. *Computers, Environment and Urban Systems*, 65, 126–139.
+5. Grover, A., Leskovec, J. (2016). node2vec: Scalable Feature Learning for Networks. *KDD 2016*.
+6. Russell, S., Norvig, P. (2020). *Artificial Intelligence: A Modern Approach*, 4th ed., Chapters 3–4 and 22. (Course textbook T1)
