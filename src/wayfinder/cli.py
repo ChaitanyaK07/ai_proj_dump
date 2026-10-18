@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import sys
 
 from wayfinder.config import load_config
 
@@ -32,8 +33,17 @@ def main(argv=None) -> None:
     p = sub.add_parser("all", help="preprocess -> splits -> benchmark -> labels -> node2vec -> train -> evaluate")
     p.add_argument("--force", action="store_true", help="regenerate frozen splits and benchmark too")
     args = ap.parse_args(argv)
+    try:
+        _run(args, load_config(args.config))
+    except FileExistsError as e:                      # frozen artefacts: expected, not a crash
+        sys.exit(f"error: {e}")
+    except FileNotFoundError as e:
+        sys.exit(f"error: {e}\nhint: run the earlier pipeline steps first (see README, 'Running the pipeline')")
+    except ValueError as e:
+        sys.exit(f"error: {e}")
 
-    cfg = load_config(args.config)
+
+def _run(args, cfg) -> None:
     from wayfinder import pipeline as P
 
     if args.cmd == "preprocess":

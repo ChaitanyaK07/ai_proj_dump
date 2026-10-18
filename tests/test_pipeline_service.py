@@ -221,3 +221,13 @@ def test_planner_is_correct_under_concurrent_requests(net):
         for got, exact in ex.map(run, jobs):
             assert got == pytest.approx(exact, rel=1e-12)
     assert len(p._spaces) <= 4
+
+
+def test_cli_reports_expected_problems_without_a_traceback(tmp_path):
+    """A missing input or a frozen file must end with a one-line `error:` message and a non-zero exit."""
+    from wayfinder.cli import main
+    cfg_file = tmp_path / "c.yaml"
+    cfg_file.write_text(f"paths:\n  results_dir: {tmp_path.as_posix()}/res\n", encoding="utf-8")
+    with pytest.raises(SystemExit) as exc:
+        main(["--config", str(cfg_file), "report"])           # no raw results yet
+    assert str(exc.value).startswith("error:") and "hint:" in str(exc.value)
