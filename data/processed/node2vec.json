@@ -1,0 +1,17 @@
+{
+  "dim": 32,
+  "walk_length": 40,
+  "walks_per_node": 10,
+  "window": 5,
+  "p": 1.0,
+  "q": 0.5,
+  "negatives": 5,
+  "epochs": 2,
+  "seed": 3,
+  "loss": [
+    0.22042902359238284,
+    0.0948666651717952
+  ],
+  "walk_seconds": 5.611388000004808,
+  "total_seconds": 217.65193680000084
+}

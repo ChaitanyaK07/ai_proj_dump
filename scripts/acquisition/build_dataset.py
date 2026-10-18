@@ -3,7 +3,7 @@ Build the raw routing dataset for one study area from OpenStreetMap.
 
     pip install osmnx rasterio   # osmnx 2.x; rasterio needed for --canopy-raster / --dem
 
-    python build_dataset.py --lat 17.4981608 --lon 78.3567628 --dist 2000 --name miyapur_2km \
+    python scripts/acquisition/build_dataset.py --lat 17.4981608 --lon 78.3567628 --dist 2000 --name miyapur_2km \
         --canopy-raster data/worldcover_N15E078.tif
 
 Canopy source:

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Routes That Fit You</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+<div class="layout">
+  <aside class="panel">
+    <header>
+      <h1>Routes That Fit You</h1>
+      <p class="muted">Walking routes in Jubilee Hills / Banjara Hills. Click the map to set a start, then a destination. Drag the markers to move them.</p>
+    </header>
+
+    <section>
+      <h2>What matters to you</h2>
+      <div class="presets" id="presets"></div>
+      <div id="sliders"></div>
+    </section>
+
+    <section>
+      <h2>Search</h2>
+      <label class="row">Algorithm
+        <select id="algorithm">
+          <option value="astar">Best route — A* (exact)</option>
+          <option value="focal">Focal Search, learned guide (within W × best)</option>
+          <option value="wastar">Weighted A* (within W × best)</option>
+          <option value="dijkstra">Dijkstra (exact, slowest)</option>
+        </select>
+      </label>
+      <label class="row" id="w-row">Suboptimality bound W <output id="w-out">1.50</output>
+        <input type="range" id="W" min="1" max="2" step="0.05" value="1.5">
+      </label>
+      <label class="check"><input type="checkbox" id="compare" checked> Show the fastest route too</label>
+      <label class="check"><input type="checkbox" id="verify"> Verify against the exact optimum</label>
+    </section>
+
+    <section id="result" hidden>
+      <h2>Your route</h2>
+      <table class="stats" id="route-stats"></table>
+      <h2>Search effort</h2>
+      <table class="stats" id="search-stats"></table>
+    </section>
+
+    <p class="error" id="error" role="alert" hidden></p>
+    <div class="legend">
+      <span><i class="swatch route"></i> your route</span>
+      <span><i class="swatch fastest"></i> fastest route</span>
+    </div>
+    <p class="muted small">Canopy is tree-cover proximity (ESA WorldCover), a proxy for shade, not shade itself. Traffic is an ordinal proxy from road class.
+      Data © OpenStreetMap contributors (ODbL), ESA WorldCover 2021 (CC BY 4.0), Copernicus GLO-30 DEM.</p>
+    <p class="small"><a href="/study">User study</a></p>
+  </aside>
+  <main id="map" aria-label="Map"></main>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,89 @@
+# Pipeline settings. Paths are relative to the repository root.
+# Cost-model constants are part of the frozen interfaces and live in src/wayfinder/cost.py.
+
+paths:
+  raw_graph: data/jubilee_3500.graphml
+  processed_dir: data/processed
+  splits_dir: data/splits
+  benchmark_dir: data/benchmark
+  labels_dir: data/labels
+  models_dir: models
+  results_dir: results
+  study_dir: data/user_study
+
+study_area:
+  name: Jubilee Hills / Banjara Hills, Hyderabad
+  center_lat: 17.4220
+  center_lon: 78.4200
+
+splits:
+  seed: 7
+  n_train_weights: 40
+  n_heldout_weights: 10
+  zero_prob: 0.3            # chance that an individual slider is switched off when sampling
+  n_label_targets: 200
+  target_split: [0.75, 0.125, 0.125]   # train / val / test, split by target node
+
+benchmark:
+  seed: 2025
+  n_queries: 200
+  min_euclid_m: 700
+  heldout_share: 0.5        # half of the queries use a held-out weight vector
+
+labels:
+  seed: 11
+  nodes_per_run: 1000       # nodes sampled from each backward run (all are exact)
+
+node2vec:
+  seed: 3
+  dim: 32
+  walk_length: 40
+  walks_per_node: 10
+  window: 5
+  p: 1.0
+  q: 0.5
+  negatives: 5
+  epochs: 2
+  batch_size: 8192
+  lr: 0.01
+
+model:
+  hidden: [256, 256]
+
+training:
+  seeds: [0, 1, 2]
+  epochs: 12
+  batch_size: 4096
+  lr: 0.001
+  weight_decay: 0.0
+  patience: 3
+  max_train_samples: null   # null = use every sample
+  hparam_grid:
+    hidden: [[128, 128], [256, 256]]
+    lr: [0.001, 0.003]
+  hparam_epochs: 3
+  hparam_max_train_samples: 1500000
+
+evaluation:
+  focal_W: [1.0, 1.1, 1.25, 1.5, 1.75, 2.0]
+  wastar_W: [1.25, 1.5, 2.0]
+  lambdas: [0.0, 0.2, 0.4, 0.6, 0.8, 0.9]
+  focal_key: f              # 'f' = g + h_learn picks from FOCAL, 'h' = h_learn alone
+  inference_mode: tile      # 'tile' = 250 m spatial tile per cache miss, 'lazy' = successors per expansion, 'full' = all nodes
+  quality_nodes_per_query: 2000
+  headline_W: 1.5
+
+user_study:
+  seed: 5
+  n_pairs: 12
+  radius_m: 2500            # OD pairs stay within this distance of the study-area centre
+  min_euclid_m: 800
+  max_overlap: 0.5
+  max_detour_pct: 15.0
+  min_gain_pct: 20.0
+
+service:
+  host: 127.0.0.1
+  port: 8000
+  default_algorithm: astar     # exact: always the best route for the chosen sliders
+  default_W: 1.5

@@ -1,0 +1,13 @@
+trial_id,profile,origin_near,destination_near,overlap,detour_pct,gain_pct,metric
+shade-1,shade,Kamalapui colony main road (about 99 m away),Road No 13 (about 59 m away),0.201,14.6,376.7,canopy_share
+shade-2,shade,Banjara Hills Road Number 3 (about 56 m away),Film Nagar Main Road (about 56 m away),0.388,12.2,183.7,canopy_share
+shade-3,shade,Road No. 3,an unnamed street,0.458,2.8,104.7,canopy_share
+shade-4,shade,IAS Colony road (about 170 m away),Road number 29 (about 123 m away),0.274,4.5,57.5,canopy_share
+quiet-1,quiet,Banjara Hills Road Number 11 (about 61 m away),Banjara Hills Road Number 14 (about 58 m away),0.457,5.0,20.8,traffic
+quiet-2,quiet,Old Bombay Road (about 200 m away),lane no 2 (about 47 m away),0.472,8.5,21.7,traffic
+quiet-3,quiet,Banjara Hills Road Number 10 (about 68 m away),Old Bombay Highway to Jubliee Hills Road,0.126,7.8,32.6,traffic
+quiet-4,quiet,Road No. 3 (about 129 m away),IAS Colony road (about 52 m away),0.345,6.7,41.9,traffic
+easy-1,easy,New Hakeempet road (about 194 m away),Brindavan Colony road (about 303 m away),0.373,5.6,21.4,effort_per_km
+easy-2,easy,Road No 10,Street Number 4 (about 161 m away),0.473,2.0,40.1,effort_per_km
+easy-3,easy,Labour Adda Rd,"IAS Colony, hakeempet road (about 153 m away)",0.278,14.3,36.3,effort_per_km
+easy-4,easy,an unnamed street,Sri Nagar Colony Main Road (about 138 m away),0.425,8.9,29.6,effort_per_km

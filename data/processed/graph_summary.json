@@ -1,0 +1,18 @@
+{
+  "nodes": 13246,
+  "directed_edges": 34708,
+  "turn_states": 34708,
+  "transitions": 103384,
+  "scc_share": 1.0,
+  "network_km_both_directions": 2075.403142734681,
+  "haversine_scale_s": 0.9999999968913685,
+  "stairs_edges": 60,
+  "elevation_relief_m": 120.87945556640625,
+  "bounds": {
+    "south": 17.390529099616618,
+    "west": 78.38701329951066,
+    "north": 17.453474299615152,
+    "east": 78.45298809959166
+  },
+  "seconds": 14.80688009998994
+}

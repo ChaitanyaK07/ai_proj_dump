@@ -1,0 +1,7 @@
+# Frozen benchmark: byte-exact on every OS (its SHA-256 is checked on load).
+data/benchmark/queries.csv -text
+data/benchmark/queries.sha256 -text
+*.npy binary
+*.npz binary
+*.pt binary
+*.png binary

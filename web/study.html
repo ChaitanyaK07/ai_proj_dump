@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Route Choice Study</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+<div class="study">
+  <h1>Which route would you take?</h1>
+  <p class="muted">For each trip you will see a short scenario and two walking routes between the same start and end in
+    Jubilee Hills / Banjara Hills. Pick the one you would actually walk. There are no right answers. Your answers are stored
+    under a random participant code only.</p>
+  <div class="progress" aria-hidden="true"><div id="bar"></div></div>
+  <div id="intro">
+    <button class="primary" id="start" type="button">Start</button>
+  </div>
+  <div class="trial" id="trial" hidden>
+    <div id="map" aria-label="Map with two routes"></div>
+    <div>
+      <p class="muted" id="counter"></p>
+      <div class="scenario" id="scenario"></div>
+      <p class="small muted" id="endpoints"></p>
+      <div class="legend">
+        <span><i class="swatch a"></i> Route A</span>
+        <span><i class="swatch b"></i> Route B</span>
+      </div>
+      <div class="choices">
+        <button type="button" data-pick="A">I would take Route A</button>
+        <button type="button" data-pick="B">I would take Route B</button>
+      </div>
+    </div>
+  </div>
+  <div id="done" hidden>
+    <h2>Thank you!</h2>
+    <p>Your answers have been recorded. Participant code: <code id="pid"></code></p>
+  </div>
+  <p class="error" id="error" role="alert" hidden></p>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="/static/study.js"></script>
+</body>
+</html>

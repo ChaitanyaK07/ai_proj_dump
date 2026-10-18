@@ -1,7 +1,7 @@
 """
 Dataset fitness report for the preference-aware pedestrian routing project.
 
-    python fitness_report.py data/jubilee_2km.graphml data/miyapur_2km.graphml
+    python scripts/acquisition/fitness_report.py data/jubilee_2km.graphml data/miyapur_2km.graphml
 
 Give one or more graphs built by build_dataset.py. For each graph it runs:
 
@@ -13,12 +13,13 @@ Give one or more graphs built by build_dataset.py. For each graph it runs:
   5. Labels       time for one full backward sweep, extrapolated to the 8,000-run label budget
   6. User study   OD pairs where a profile route clearly differs from the fastest route
 
-Writes to fitness/:
+Writes to results/audit/:
     <name>_verdict.csv  <name>_sliders.csv  <name>_search_curve.csv  <name>_search_curve.png
     <name>_study_candidates.csv   and comparison.csv when several graphs are given.
 
 The cost model below follows the proposal (A.2/A.3) with two fixes: walking time is
-normalised by its max (never 0) and a BASE term keeps rho_min > 0. Edit to match interfaces.py.
+normalised by its max (never 0) and a BASE term keeps rho_min > 0. This is the pre-project audit;
+the frozen cost model used by the system lives in src/wayfinder/cost.py.
 """
 import ast
 import heapq
@@ -480,7 +481,7 @@ def run(path, out_dir):
 
 def main():
     paths = sys.argv[1:] or ["data/jubilee_2km.graphml"]
-    out_dir = Path("fitness")
+    out_dir = Path("results/audit")
     out_dir.mkdir(exist_ok=True)
     results = [run(p, out_dir) for p in paths]
 

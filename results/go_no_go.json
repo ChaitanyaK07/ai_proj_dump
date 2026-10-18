@@ -1,0 +1,19 @@
+{
+  "headline_W": 1.5,
+  "median_expanded": {
+    "dijkstra": 17574.0,
+    "astar_hadm": 13167.5,
+    "wastar_hadm_W1.5": 11054.0,
+    "focal_tuned_W1.5": 11028.5,
+    "focal_learned_W1.5": 11161.0,
+    "focal_hstar_W1.5 (perfect guide)": 10846.5,
+    "astar_learned (unbounded)": 1205.0
+  },
+  "learned_beats_astar_hadm": true,
+  "learned_beats_tuned_classical_same_W": false,
+  "learned_beats_wastar_same_W": false,
+  "verdict": "NO-GO",
+  "headline": "Fallback: Focal Search guided by the tuned classical heuristic (W=1.5); the learned guide is far more informed (heuristic_quality.csv), but Focal Search cannot exploit it: even the perfect guide h* barely helps, because FOCAL is gated by the weak admissible OPEN heuristic (see focal_hstar and focal_floor)",
+  "expansion_reduction_vs_astar_hadm_pct": 15.238276058477307,
+  "perfect_guide_reduction_vs_astar_hadm_pct": 17.626732485285746
+}

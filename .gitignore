@@ -1,2 +1,43 @@
+# ---------------------------------------------------------------- data that is too large or regenerable
+# Exact labels are ~150 MB (over GitHub's 100 MB file limit): `python -m wayfinder labels` (2-3 min)
+data/labels/*.npz
+# Graph arrays: `python -m wayfinder preprocess` (15 s)
+data/processed/graph.npz
+
+# Raw rasters and the OSMnx download cache (scripts/acquisition/)
 *.tif
+*.tiff
 cache/
+
+# ---------------------------------------------------------------- run output
+# console logs of long runs (the result files they produced are tracked)
+*.log
+# user-study answers are participant data: share results/user_study/summary.csv, not the raw file
+results/user_study/responses.jsonl
+
+# ---------------------------------------------------------------- python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.coverage
+htmlcov/
+.ipynb_checkpoints/
+
+# virtual environments
+.venv/
+venv/
+env/
+.conda/
+
+# ---------------------------------------------------------------- editors and OS
+.idea/
+.vscode/
+.claude/
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini

@@ -1,0 +1,6 @@
+feature,source,status,mean,length_weighted_mean,p10,p90,share_nonzero
+time,"OSM highway class, segment length",measured,0.4224798649980665,0.42349681502211906,0.4166666666666667,0.45454545454545453,1.0
+traffic,ranking over OSM highway class,proxy,0.36789212861588105,0.39029237050912696,0.3,0.6,0.9862279589719949
+canopy,"ESA WorldCover 2021 tree cover, 15 m buffer",proxy,0.9450809024422316,0.9122961968614728,0.813953488372093,1.0,0.9982136683185433
+climb,Copernicus GLO-30 DEM grade; highway=steps,"derived, reliable",0.1432895091909359,0.11860822769716765,0.0,0.4935328635999162,0.44053244208827935
+junction,"node degree, way geometry","derived, exact",1.6129517139982972,,0.2,3.2,0.9950475895689855
