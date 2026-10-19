@@ -330,7 +330,7 @@ always holds, and W = 1.0 is always exactly optimal.
   The route updates as you drag, and only the newest request may draw, so a slow earlier reply cannot overwrite it.
   **By default the search is exact (A\*)**: the displayed route is the best possible route for the chosen sliders.
   Focal Search and weighted A\* are opt-in modes labelled "within W × best".
-* **Tests:** 86 tests, run on a synthetic fixture graph and on the real graph (Section 12).
+* **Tests:** 87 tests, run on a synthetic fixture graph and on the real graph (Section 12).
 
 ---
 
@@ -533,7 +533,8 @@ Everything except the participants:
   centre. It was chosen so that the profile route is clearly different from the fastest route (overlap ≤ 0.5), costs
   at most a 15 % detour, and improves its target property by at least 20 %. Endpoints are described by the nearest
   named street.
-* **A study page** (`/study`): routes are shown as "Route A" / "Route B" in a fresh random order for every trial.
+* **A study page** (`/study`): routes are shown as "Route A" / "Route B". The order is counterbalanced: each route is
+  shown first in exactly half of the trials, in shuffled positions, so no participant can see one route first throughout.
   Each answer stores the participant code, the trial, the choice and which route was shown first. Responses are kept
   out of the repository (`.gitignore`), and `python -m wayfinder study-analyze` produces the agreement table.
 
@@ -606,7 +607,7 @@ embeddings, trained models and every result file.
 
 ```bash
 python -m pip install -r requirements-dev.txt && python -m pip install -e . --no-deps
-python -m pytest                       # 86 tests: fixture graph + real graph
+python -m pytest                       # 87 tests: fixture graph + real graph
 python scripts/verify_routes.py        # 147 random trips: exact routes, slider monotonicity
 python -m wayfinder serve              # web app at http://127.0.0.1:8000
 python -m wayfinder all                # whole pipeline from the GraphML (~1.5 h on a laptop CPU)

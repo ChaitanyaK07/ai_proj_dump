@@ -129,18 +129,34 @@ async function requestRoute() {
   };
   try {
     const res = await fetch("/api/route", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
-    const data = await res.json();
+    let data;
+    try { data = await res.json(); } catch (_) { data = { detail: `server error (${res.status})` }; }
     if (requestId !== latestRequest) return;   // superseded by a newer slider position
     if (!res.ok) throw new Error(data.detail || res.statusText);
+    if (data.origin.node === data.destination.node) {
+      clearRoute();
+      markers.origin.setLatLng([data.origin.lat, data.origin.lon]);
+      markers.destination.setLatLng([data.destination.lat, data.destination.lon]);
+      showError("Start and destination are at the same place. Move one of the markers.");
+      return;
+    }
     showError("");
     draw(data);
   } catch (err) {
-    if (requestId === latestRequest) showError(String(err.message || err));
+    if (requestId === latestRequest) {
+      clearRoute();                            // never leave a route on the map that no longer matches the markers
+      showError(String(err.message || err));
+    }
   }
 }
 
-function draw(data) {
+function clearRoute() {
   for (const k of Object.keys(layers)) if (layers[k]) { map.removeLayer(layers[k]); layers[k] = null; }
+  document.getElementById("result").hidden = true;
+}
+
+function draw(data) {
+  clearRoute();
   if (data.fastest) {
     layers.fastest = L.polyline(data.fastest.latlon, { color: color("--fastest"), weight: 5, opacity: 0.8, dashArray: "8 8" })
       .addTo(map).bindTooltip("Fastest route", { sticky: true });

@@ -240,7 +240,7 @@ WayFinder/
 │   ├── service/                   planner.py (routing facade), api.py (FastAPI)
 │   ├── pipeline.py                the pipeline steps
 │   └── cli.py                     `python -m wayfinder <step>`
-├── tests/                         pytest suite (86 tests)
+├── tests/                         pytest suite (87 tests)
 └── web/                           index.html + app.js (map and sliders), study.html + study.js, styles.css
 ```
 
@@ -265,7 +265,7 @@ Details: [`data/README.md`](data/README.md).
 ## Testing
 
 ```bash
-python -m pytest                  # all 86 tests, ~1 min
+python -m pytest                  # all 87 tests, ~1 min
 python -m pytest -m "not slow"    # skip the checks that need the real graph
 python scripts/verify_routes.py   # 147 random trips on the real graph
 ```

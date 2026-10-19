@@ -231,3 +231,13 @@ def test_cli_reports_expected_problems_without_a_traceback(tmp_path):
     with pytest.raises(SystemExit) as exc:
         main(["--config", str(cfg_file), "report"])           # no raw results yet
     assert str(exc.value).startswith("error:") and "hint:" in str(exc.value)
+
+
+def test_pages_and_scripts_are_revalidated(net, tmp_cfg):
+    """Updated web files must reach the browser: pages and static files are sent with Cache-Control: no-cache."""
+    from fastapi.testclient import TestClient
+    from wayfinder.service.api import create_app
+    client = TestClient(create_app(RoutePlanner(net), tmp_cfg))
+    for path in ("/", "/study", "/static/app.js", "/static/study.js", "/static/styles.css"):
+        r = client.get(path)
+        assert r.status_code == 200 and r.headers.get("cache-control") == "no-cache", path

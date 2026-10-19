@@ -63,6 +63,14 @@ def create_app(planner: RoutePlanner | None = None, cfg=None) -> FastAPI:
     cfg = cfg or load_config()
     app = FastAPI(title="Routes That Fit You", version="0.1.0")
     state = {"planner": planner}
+
+    @app.middleware("http")
+    async def revalidate_pages(request, call_next):
+        # browsers must re-check pages and scripts on every load, so an updated app.js is never served stale
+        response = await call_next(request)
+        if not request.url.path.startswith("/api/"):
+            response.headers["Cache-Control"] = "no-cache"
+        return response
     planner_lock, responses_lock = threading.Lock(), threading.Lock()
 
     def get_planner() -> RoutePlanner:

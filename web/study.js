@@ -15,6 +15,21 @@ const pid = participantId();
 const css = getComputedStyle(document.documentElement);
 const color = (name) => css.getPropertyValue(name).trim();
 let trials = [];
+let orders = [];       // counterbalanced: each route is shown first in half of the trials, positions shuffled
+
+function shuffle(a) {
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function balancedOrders(n) {
+  const out = [];
+  for (let i = 0; i < n; i++) out.push(i % 2 === 0 ? ["profile", "fastest"] : ["fastest", "profile"]);
+  return shuffle(out);
+}
 let index = 0;
 let current = null;    // { order: ["profile","fastest"] or reverse, started }
 let map = null;
@@ -40,7 +55,7 @@ function showTrial() {
   document.getElementById("counter").textContent = `Trip ${index + 1} of ${trials.length}`;
   document.getElementById("scenario").textContent = t.scenario;
   document.getElementById("endpoints").textContent = `From near ${t.origin.near} to near ${t.destination.near}.`;
-  const order = Math.random() < 0.5 ? ["profile", "fastest"] : ["fastest", "profile"];
+  const order = orders[index];
   current = { order, started: performance.now() };
   for (const l of drawn) map.removeLayer(l);
   drawn = [];
@@ -56,7 +71,25 @@ function showTrial() {
   map.fitBounds(L.featureGroup(drawn.slice(0, 2)).getBounds(), { padding: [30, 30] });
 }
 
+let saving = false;    // one answer at a time: a double-click must not record twice or skip a trip
+
+function setButtons(enabled) {
+  document.querySelectorAll("[data-pick]").forEach((b) => { b.disabled = !enabled; });
+}
+
 async function choose(letter) {
+  if (saving || index >= trials.length) return;
+  saving = true;
+  setButtons(false);
+  try {
+    await submit(letter);
+  } finally {
+    saving = false;
+    setButtons(true);
+  }
+}
+
+async function submit(letter) {
   const t = trials[index];
   const kind = current.order["AB".indexOf(letter)];
   const body = {
@@ -89,6 +122,7 @@ document.getElementById("start").addEventListener("click", async () => {
     const data = await res.json();
     if (!res.ok) throw new Error(data.detail || res.statusText);
     trials = data.trials;
+    orders = balancedOrders(trials.length);
   } catch (err) {
     showError("Could not load the study: " + (err.message || err));
     return;
