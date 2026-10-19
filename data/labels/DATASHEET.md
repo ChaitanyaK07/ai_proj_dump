@@ -8,14 +8,22 @@ Exact optimal cost-to-go labels for the Jubilee Hills / Banjara Hills walking gr
 * **Weights:** `data/splits/weights.json` (40 train, 10 held-out); keys `time, junction, traffic, canopy, climb`.
 * **Targets:** `data/splits/targets.json` (200 nodes; train / val / test split by target).
 
-| file | weight vectors | targets | runs | samples |
-|---|---|---|---|---|
-| `labels_train_weights.npz` | 40 train | all 200 | 8000 | 8000000 |
-| `labels_heldout_weights.npz` | 10 held-out | val + test | 500 | 500000 |
+| folder | weight vectors | targets | runs | samples | shards |
+|---|---|---|---|---|---|
+| `train_weights/` | 40 train | all 200 | 8000 | 8000000 | `w00.npz` … `w39.npz` |
+| `heldout_weights/` | 10 held-out | val + test | 500 | 500000 | `w00.npz` … `w09.npz` |
 
-Columns (one row per sample): `node`, `target` (node indices into `data/processed/graph.npz`), `widx`
-(row of `weights`), `h_star` (exact optimal cost from `node` to `target`), `h_adm` (the admissible
-heuristic). `h_star / h_adm >= 1` always holds; the number of violations found while generating is
-stored as `admissibility_violations` (must be 0).
+Each shard holds the samples of one weight vector (`wNN` = row NN of that folder's `weights`), with
+columns `node`, `target` (node indices into `data/processed/graph.npz`), `widx`, `h_star` (exact optimal
+cost from `node` to `target`) and `h_adm` (the admissible heuristic). `index.json` stores the weight
+vectors, a SHA-256 per shard (checked on load), and `admissibility_violations` — the number of samples
+with `h_adm > h_star` found while generating, which must be 0.
+
+Load in Python:
+
+```python
+from wayfinder.learning.labels import load_labels
+labels = load_labels("data/labels/train_weights")   # dict of numpy arrays, 8,000,000 rows
+```
 
 Licences: derived from OpenStreetMap (ODbL), ESA WorldCover 2021 (CC BY 4.0), Copernicus GLO-30 DEM.

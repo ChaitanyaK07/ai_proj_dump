@@ -13,6 +13,7 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
+from matplotlib.ticker import FuncFormatter, LogLocator, NullFormatter  # noqa: E402
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 
@@ -56,6 +57,13 @@ def _style(ax, title: str, xlabel: str, ylabel: str):
 def _fig(w=6.4, h=4.2):
     fig, ax = plt.subplots(figsize=(w, h), facecolor=SURFACE)
     return fig, ax
+
+
+def _readable_log_axis(ax, fmt: str = "{:,.0f}"):
+    """Log y-axis labelled with plain numbers at 1-2-5 steps instead of bare powers of ten."""
+    ax.yaxis.set_major_locator(LogLocator(base=10, subs=(1.0, 2.0, 5.0)))
+    ax.yaxis.set_major_formatter(FuncFormatter(lambda v, _: fmt.format(v)))
+    ax.yaxis.set_minor_formatter(NullFormatter())
 
 
 def _save(fig, path: Path):
@@ -121,6 +129,7 @@ def plot_expansions_vs_W(bound: pd.DataFrame, summary: pd.DataFrame, path: Path)
                        linestyle="--", label=LABEL[fam])
     _style(ax, "Search effort against the suboptimality bound", "bound W", "median states expanded")
     ax.set_yscale("log")
+    _readable_log_axis(ax)
     ax.legend(frameon=False, labelcolor=INK_2, fontsize=8)
     _save(fig, path)
 
@@ -166,6 +175,7 @@ def plot_training_curves(logs: dict[int, pd.DataFrame], path: Path):
         ax.plot(log["epoch"], log["val_mse_log"], ":", color=c, linewidth=2, label=f"seed {seed} val")
     _style(ax, "Training curves (MSE of log ratio)", "epoch", "MSE of log(h*/h_adm)")
     ax.set_yscale("log")
+    _readable_log_axis(ax, "{:g}")
     ax.legend(frameon=False, labelcolor=INK_2, fontsize=8, ncol=2)
     _save(fig, path)
 

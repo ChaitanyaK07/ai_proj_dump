@@ -132,3 +132,20 @@ def test_tuned_classical_fit_recovers_coefficients():
     assert np.allclose(tuned.coef, coef, atol=1e-9)
     assert tuned.kappa(np.zeros(5)) == pytest.approx(np.exp(0.5))
     assert TunedClassicalHeuristic(np.array([-5, 0, 0, 0, 0, 0])).kappa(np.zeros(5)) == 1.0     # never below 1
+
+
+def test_label_shards_roundtrip_and_checksum(trained, tmp_path):
+    from wayfinder.learning.labels import COLUMNS, load_labels, save_labels
+    labels = trained["labels"]
+    out = tmp_path / "train_weights"
+    save_labels(labels, out, {"weight_set": "train"})
+    assert len(list(out.glob("w*.npz"))) == len(labels["weights"])
+    back = load_labels(out)
+    for c in COLUMNS:
+        assert np.array_equal(back[c], labels[c]) and back[c].dtype == labels[c].dtype
+    assert np.array_equal(back["weights"], labels["weights"])
+    assert int(back["admissibility_violations"]) == 0 and back["meta"]["weight_set"] == "train"
+    shard = out / "w00.npz"
+    shard.write_bytes(shard.read_bytes()[:-1] + b"x")          # tamper with one byte
+    with pytest.raises(ValueError):
+        load_labels(out)

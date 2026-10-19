@@ -1,0 +1,156 @@
+{
+ "graph": "jubilee_3500.graphml",
+ "weight_keys": [
+  "time",
+  "junction",
+  "traffic",
+  "canopy",
+  "climb"
+ ],
+ "nodes_per_run": 1000,
+ "weight_set": "heldout",
+ "columns": [
+  "node",
+  "target",
+  "widx",
+  "h_star",
+  "h_adm"
+ ],
+ "weights": [
+  [
+   0.812,
+   0.658,
+   0.611,
+   0.191,
+   0.574
+  ],
+  [
+   0.04,
+   0.802,
+   0.96,
+   0.854,
+   0.051
+  ],
+  [
+   0.339,
+   0.318,
+   0.113,
+   0.627,
+   0.797
+  ],
+  [
+   0.314,
+   0.863,
+   0.797,
+   0.129,
+   0.767
+  ],
+  [
+   0.0,
+   0.197,
+   0.574,
+   0.639,
+   0.609
+  ],
+  [
+   0.096,
+   0.661,
+   0.632,
+   0.824,
+   0.0
+  ],
+  [
+   0.0,
+   0.0,
+   0.867,
+   0.893,
+   0.162
+  ],
+  [
+   0.027,
+   0.651,
+   0.215,
+   0.564,
+   0.945
+  ],
+  [
+   0.379,
+   0.0,
+   0.457,
+   0.657,
+   0.101
+  ],
+  [
+   0.0,
+   0.134,
+   0.662,
+   0.831,
+   0.0
+  ]
+ ],
+ "admissibility_violations": 0,
+ "seconds": 3.2377139999880455,
+ "samples": 500000,
+ "shards": [
+  {
+   "file": "w00.npz",
+   "widx": 0,
+   "samples": 50000,
+   "sha256": "e3cfc476ea4ebac9e5210a3e696bc381afc2e7f67907210634bb20812c572c03"
+  },
+  {
+   "file": "w01.npz",
+   "widx": 1,
+   "samples": 50000,
+   "sha256": "9594978e6e058e040cd7537a698a6f1219ae4b9099d2e3913f11ac370a2ca472"
+  },
+  {
+   "file": "w02.npz",
+   "widx": 2,
+   "samples": 50000,
+   "sha256": "ac03cbbba096d2d8256a268b3f331082c9e073f01eefcbd4948c1ff3072267d7"
+  },
+  {
+   "file": "w03.npz",
+   "widx": 3,
+   "samples": 50000,
+   "sha256": "13702ae750de6e63279a32c7a8c34dacc8b5db6ce3899784cf4f938cd82491c5"
+  },
+  {
+   "file": "w04.npz",
+   "widx": 4,
+   "samples": 50000,
+   "sha256": "48bf21f9e87dab636fb955b77a74f6adb10e9ce069912007a30b83356f7c32de"
+  },
+  {
+   "file": "w05.npz",
+   "widx": 5,
+   "samples": 50000,
+   "sha256": "057ea83e2de310c21d76621d4fd714c453bc41a14176475cf938dab085d77241"
+  },
+  {
+   "file": "w06.npz",
+   "widx": 6,
+   "samples": 50000,
+   "sha256": "6bff96d6f96dff36aac511d021e22f630cf5aa6802658a08dc60309946dc36a0"
+  },
+  {
+   "file": "w07.npz",
+   "widx": 7,
+   "samples": 50000,
+   "sha256": "b7cc179887872fec28c4f2705d4f19053c5d91a52d523c121a66c5ea0a407272"
+  },
+  {
+   "file": "w08.npz",
+   "widx": 8,
+   "samples": 50000,
+   "sha256": "7dd167f6e1f83f4e48a97b22ad73c7fdd46941df00388912d5666af4e7636777"
+  },
+  {
+   "file": "w09.npz",
+   "widx": 9,
+   "samples": 50000,
+   "sha256": "3d830dcca547ca7c7a5d3758e38138a74979af8d026f7fb0dae671f1a96e8eb7"
+  }
+ ]
+}

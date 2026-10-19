@@ -1,9 +1,9 @@
 {
   "train_runs": 8000,
   "train_samples": 8000000,
-  "train_seconds": 127.82818630000111,
+  "train_seconds": 59.536041099985596,
   "heldout_runs": 500,
   "heldout_samples": 500000,
-  "heldout_seconds": 5.80967889999738,
+  "heldout_seconds": 3.2377139999880455,
   "admissibility_violations": 0
 }

@@ -1,8 +1,9 @@
-# ---------------------------------------------------------------- data that is too large or regenerable
-# Exact labels are ~150 MB (over GitHub's 100 MB file limit): `python -m wayfinder labels` (2-3 min)
-data/labels/*.npz
-# Graph arrays: `python -m wayfinder preprocess` (15 s)
-data/processed/graph.npz
+# ---------------------------------------------------------------- data
+# Published on purpose (do NOT ignore): data/labels/train_weights/, data/labels/heldout_weights/
+# (label shards, ~3.5 MB each) and data/processed/graph.npz (2 MB, byte-identical on every rebuild).
+#
+# Never commit a single-file label set: it is ~140 MB, over GitHub's 100 MB per-file limit.
+data/labels/labels_*.npz
 
 # Raw rasters and the OSMnx download cache (scripts/acquisition/)
 *.tif
@@ -14,6 +15,8 @@ cache/
 *.log
 # user-study answers are participant data: share results/user_study/summary.csv, not the raw file
 results/user_study/responses.jsonl
+# intermediate file of the report build (REPORT.md and the PDF are tracked)
+docs/report/_build/
 
 # ---------------------------------------------------------------- python
 __pycache__/
@@ -23,6 +26,7 @@ __pycache__/
 build/
 dist/
 .pytest_cache/
+.ruff_cache/
 .coverage
 htmlcov/
 .ipynb_checkpoints/

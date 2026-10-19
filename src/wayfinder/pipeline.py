@@ -47,9 +47,10 @@ def step_preprocess(cfg: Config) -> dict:
                "scc_share": rg.meta["scc_share"], "network_km_both_directions": float(rg.length.sum() / 1000),
                "haversine_scale_s": cm.hav_scale, "stairs_edges": int(rg.steps.sum()),
                "elevation_relief_m": float(np.nanmax(rg.elevation) - np.nanmin(rg.elevation)),
-               "bounds": rg.bounds_latlon(), "seconds": time.perf_counter() - t0}
+               "bounds": rg.bounds_latlon()}
     (cfg.path("processed_dir") / "graph_summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
     print(json.dumps(summary, indent=2))
+    print(f"  done in {time.perf_counter() - t0:.1f} s")
     return summary
 
 
@@ -83,7 +84,7 @@ def step_benchmark(cfg: Config, force: bool = False) -> pd.DataFrame:
 # ---------------------------------------------------------------------------------------------- learning
 def step_labels(cfg: Config) -> dict:
     _banner("labels: backward Dijkstra sweep")
-    from wayfinder.learning.labels import (DATASHEET, HELDOUT_FILE, TRAIN_FILE, generate_labels, save_labels)
+    from wayfinder.learning.labels import DATASHEET, HELDOUT_DIR, TRAIN_DIR, generate_labels, save_labels
     from wayfinder.learning.splits import check_splits_match_graph, load_splits
 
     net = load_network(cfg)
@@ -97,15 +98,15 @@ def step_labels(cfg: Config) -> dict:
 
     print(f"  training weights: {len(splits['weights']['train'])} x {len(all_targets)} targets")
     tr = generate_labels(net, splits["weights"]["train"], all_targets, lc["nodes_per_run"], lc["seed"])
-    save_labels(tr, out / TRAIN_FILE, {**meta, "weight_set": "train"})
+    save_labels(tr, out / TRAIN_DIR, {**meta, "weight_set": "train"})
     print(f"  held-out weights: {len(splits['weights']['heldout'])} x {len(eval_targets)} targets")
     ho = generate_labels(net, splits["weights"]["heldout"], eval_targets, lc["nodes_per_run"], lc["seed"] + 1)
-    save_labels(ho, out / HELDOUT_FILE, {**meta, "weight_set": "heldout"})
+    save_labels(ho, out / HELDOUT_DIR, {**meta, "weight_set": "heldout"})
 
     n_tr_runs = len(splits["weights"]["train"]) * len(all_targets)
     n_ho_runs = len(splits["weights"]["heldout"]) * len(eval_targets)
     (out / "DATASHEET.md").write_text(DATASHEET.format(
-        n=net.rg.n, m=net.rg.m, keys=", ".join(WEIGHT_KEYS), train_file=TRAIN_FILE, heldout_file=HELDOUT_FILE,
+        n=net.rg.n, m=net.rg.m, keys=", ".join(WEIGHT_KEYS), train_file=TRAIN_DIR, heldout_file=HELDOUT_DIR,
         train_runs=n_tr_runs, train_samples=len(tr["node"]), heldout_runs=n_ho_runs,
         heldout_samples=len(ho["node"])), encoding="utf-8")
     summary = {"train_runs": n_tr_runs, "train_samples": int(len(tr["node"])), "train_seconds": float(tr["seconds"]),
@@ -142,7 +143,7 @@ def step_train(cfg: Config, hparam: bool = False, seeds=None) -> pd.DataFrame:
 
     from wayfinder.graph.road_graph import RoadGraph
     from wayfinder.learning.artifacts import HPARAMS_FILE, TUNED_FILE, checkpoint_path, load_embeddings
-    from wayfinder.learning.labels import HELDOUT_FILE, TRAIN_FILE, load_labels, split_mask
+    from wayfinder.learning.labels import HELDOUT_DIR, TRAIN_DIR, load_labels, split_mask
     from wayfinder.learning.model import FeatureBuilder
     from wayfinder.learning.splits import load_splits
     from wayfinder.learning.train import LabelTensors, hyperparameter_pass, label_metrics, train_one
@@ -152,8 +153,8 @@ def step_train(cfg: Config, hparam: bool = False, seeds=None) -> pd.DataFrame:
     rg = RoadGraph.load(processed_graph_path(cfg))
     splits = load_splits(cfg)
     targets = splits["targets"]
-    labels = load_labels(cfg.path("labels_dir") / TRAIN_FILE)
-    heldout = load_labels(cfg.path("labels_dir") / HELDOUT_FILE)
+    labels = load_labels(cfg.path("labels_dir") / TRAIN_DIR)
+    heldout = load_labels(cfg.path("labels_dir") / HELDOUT_DIR)
     fb = FeatureBuilder(load_embeddings(cfg, rg.n), rg.x, rg.y)
     models_dir = cfg.path("models_dir")
     models_dir.mkdir(parents=True, exist_ok=True)
